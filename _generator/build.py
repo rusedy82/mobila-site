@@ -14,7 +14,7 @@ C = {
     "sub": "Fabricăm și montăm în toată România",
     "tel_afisat": "0759 324 006",
     "tel_link": "+40759324006",
-    "email": "corusglobalwork@gmail.com",   # doar destinația formularului, nu se afișează
+    "whatsapp": "40759324006",               # numărul care primește cererile din formular
     "domeniu": "",                           # gol până avem domeniul: fără canonical și sitemap
 }
 
@@ -263,13 +263,15 @@ def steps_html():
     return '<div class="steps">' + "".join(f'<div class="step"><div><h3>{t}</h3><p>{d}</p><span class="tag">{g}</span></div></div>' for t, d, g in STEPS) + "</div>"
 
 # ---------- formular cerere ofertă ----------
+WA_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>'
+
 def oferta_section():
     tipuri = "".join(f"<option>{p['titlu']}</option>" for p in PRODUSE)
     oras_opts = "".join(f"<option>{o}</option>" for o in ORASE)
     return f'''
 <section id="oferta" class="order-sec"><div class="wrap">
   <div class="head"><span class="eyebrow pill">Cere ofertă</span><h2>Cere o ofertă sau programează măsurătorile</h2>
-  <p>Completează câteva detalii și te sunăm noi. Măsurătorile sunt gratuite, iar oferta nu te obligă la nimic.</p></div>
+  <p>Completează câteva detalii și apasă butonul: cererea se deschide gata scrisă în WhatsApp, iar tu doar o trimiți. Măsurătorile sunt gratuite, iar oferta nu te obligă la nimic.</p></div>
   <form id="of-form" class="order" novalidate>
     <fieldset class="fs">
       <legend><span class="n">{icon("user", 20, "#fff")}</span>Datele tale</legend>
@@ -293,16 +295,17 @@ def oferta_section():
       <label>Când ți-ar conveni măsurătorile <small>(opțional)</small><input name="Dată măsurători" placeholder="de ex. sâmbătă dimineața, săptămâna viitoare"></label>
     </fieldset>
     <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <label class="agree"><input type="checkbox" required> Sunt de acord să fiu contactat telefonic pentru această cerere.</label>
-    <button class="btn" type="submit" id="of-submit">Trimite cererea</button>
+    <label class="agree"><input type="checkbox" required> Sunt de acord să fiu contactat telefonic sau pe WhatsApp pentru această cerere.</label>
+    <button class="btn btn-wa" type="submit" id="of-submit">{WA_ICON} Trimite cererea pe WhatsApp</button>
     <div id="of-msg" class="order-msg err" role="alert" hidden></div>
   </form>
   <div id="of-ok" class="order-ok" tabindex="-1" hidden>
     <div class="ok-ic"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
-    <h3>Cererea ta s-a trimis!</h3>
-    <p class="ok-thanks">Vă mulțumim!</p>
+    <h3>Vă mulțumim!</h3>
+    <p class="ok-thanks">Cererea ta e gata în WhatsApp.</p>
     <div class="ok-sum" id="ok-sum"></div>
-    <p class="ok-next">Te sunăm în cel mai scurt timp la <b id="ok-tel"></b> ca să stabilim măsurătorile.</p>
+    <p class="ok-next"><b>Ultimul pas:</b> în WhatsApp, apasă <b>Trimite</b>. Dacă WhatsApp nu s-a deschis, apasă butonul de mai jos.</p>
+    <p style="margin-top:16px"><a class="btn btn-wa" id="wa-again" href="https://wa.me/{C["whatsapp"]}" target="_blank" rel="noopener">{WA_ICON} Deschide WhatsApp</a></p>
     <p class="ok-urgent">Dacă vrei să vorbim acum: <a href="tel:{C["tel_link"]}">{C["tel_afisat"]}</a></p>
     <button type="button" class="btn ghost" id="ok-again">Trimite altă cerere</button>
   </div>
@@ -321,18 +324,15 @@ def oferta_section():
     document.getElementById("tel-err").hidden=tel.validity.valid;
     if(!f.checkValidity()){{ f.reportValidity(); return; }}
     var d={{}}; new FormData(f).forEach(function(v,k){{ d[k]=v; }});
-    d["_subject"]="Cerere ofertă: "+d["Tip mobilă"]+" - "+d["Nume"]+" ("+d["Telefon"]+"), "+d["Oraș"];
-    d["_template"]="table"; d["_captcha"]="false";
-    btn.disabled=true; btn.textContent="Se trimite...";
-    fetch("https://formsubmit.co/ajax/{C["email"]}",{{method:"POST",headers:{{"Content-Type":"application/json","Accept":"application/json"}},body:JSON.stringify(d)}})
-      .then(function(r){{ return r.json().then(function(j){{ if(!r.ok||String(j.success)!=="true") throw new Error("x"); }}); }})
-      .then(function(){{
-        document.getElementById("ok-sum").innerHTML="<div><span>Mobilă</span><b>"+esc(d["Tip mobilă"])+"</b></div><div><span>Oraș</span><b>"+esc(d["Oraș"])+"</b></div><div><span>Material</span><b>"+esc(d["Material"])+"</b></div>";
-        document.getElementById("ok-tel").textContent=d["Telefon"];
-        f.reset(); msg.hidden=true; f.hidden=true;
-        var ok=document.getElementById("of-ok"); ok.hidden=false; ok.scrollIntoView({{block:"center",behavior:"smooth"}}); ok.focus({{preventScroll:true}}); }})
-      .catch(function(){{ msg.hidden=false; msg.innerHTML="Cererea nu a putut fi trimisă. Te rugăm să ne suni la <a href=\\"tel:{C["tel_link"]}\\">{C["tel_afisat"]}</a>."; }})
-      .finally(function(){{ btn.disabled=false; btn.textContent="Trimite cererea"; }});
+    var ordine=["Nume","Telefon","Oraș","Județ","Tip mobilă","Material","Dimensiuni","Descriere","Dată măsurători"];
+    var txt="Bună ziua! Aș dori o ofertă pentru mobilă la comandă.\\n";
+    ordine.forEach(function(k){{ var v=(d[k]||"").trim(); if(v) txt+="\\n"+k+": "+v; }});
+    var url="https://wa.me/{C["whatsapp"]}?text="+encodeURIComponent(txt);
+    document.getElementById("wa-again").href=url;
+    document.getElementById("ok-sum").innerHTML="<div><span>Mobilă</span><b>"+esc(d["Tip mobilă"])+"</b></div><div><span>Oraș</span><b>"+esc(d["Oraș"])+"</b></div><div><span>Material</span><b>"+esc(d["Material"])+"</b></div>";
+    f.reset(); msg.hidden=true; f.hidden=true;
+    var ok=document.getElementById("of-ok"); ok.hidden=false; ok.scrollIntoView({{block:"center",behavior:"smooth"}});
+    var w=window.open(url,"_blank"); if(!w) window.location.href=url;
   }});
 }})();
 </script>'''
