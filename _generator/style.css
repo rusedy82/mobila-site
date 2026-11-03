@@ -554,3 +554,9 @@ footer{background:#191512}
 
 .btn-wa{background:linear-gradient(135deg,#2BD366,#1DA851)!important;box-shadow:0 14px 30px -12px rgba(29,168,81,.75)!important;align-items:center}
 .btn-wa:hover{box-shadow:0 18px 34px -12px rgba(29,168,81,.9)!important}
+
+/* etichete formular: steluța rămâne pe același rând cu textul */
+.order label:not(.agree){display:block}
+.order label:not(.agree)>input,.order label:not(.agree)>select,.order label:not(.agree)>textarea{display:block;margin-top:6px}
+.order .err-txt{display:block;margin-top:6px}
+.order .row2,.order .row3{align-items:end}
