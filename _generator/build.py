@@ -11,7 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 C = {
     "nume": "Mobilă la Comandă",            # PROVIZORIU
-    "sub": "Fabricăm și montăm în toată România",
+    "sub": "Fabricăm și montăm în Timișoara și în toată România",
     "tel_afisat": "0759 324 006",
     "tel_link": "+40759324006",
     "whatsapp": "40759324006",               # numărul care primește cererile din formular
@@ -123,7 +123,7 @@ def logo(light=False):
     return f'''<span class="logo{' logo-light' if light else ''}">{logo_mark()}<span class="wm"><span class="wm1">{a} <i>{b}</i></span><small>{C["sub"]}</small></span></span>'''
 
 def header():
-    return f'''<div class="live"><div class="wrap"><span class="dot"></span>Răspundem acum<span class="hide-m"> · Măsurători gratuite în toată țara</span></div></div>
+    return f'''<div class="live"><div class="wrap"><span class="dot"></span>Răspundem acum<span class="hide-m"> · Măsurători gratuite în Timișoara și în toată țara</span></div></div>
 <header class="top"><div class="wrap">
   <a class="brand" href="index.html" aria-label="{C["nume"]}, pagina principală">
     {logo()}
@@ -159,9 +159,36 @@ def oras_slug(o):
     t = o.lower().replace("ș", "s").replace("ț", "t").replace("ă", "a").replace("â", "a").replace("î", "i").replace(" ", "-")
     return "mobila-la-comanda-" + t
 
+# ---------- date structurate (schema.org) ----------
+import json as _json, re as _ld_re
+def ld_tag(obj):
+    s = _json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    return f'<script type="application/ld+json">{s}</script>\n'
+
+def breadcrumb_ld(path, body):
+    # Se construiește din firimiturile vizibile pe pagină, ca să spună același lucru.
+    m = _ld_re.search(r'<p class="crumbs">(.*?)</p>', body, _ld_re.S)
+    if not m or not C["domeniu"]: return ""
+    crumbs = m.group(1)
+    items = [(html.unescape(t).strip(), C["domeniu"] + "/" + ("" if h == "index.html" else h))
+             for h, t in _ld_re.findall(r'<a href="([^"]+)">(.*?)</a>', crumbs)]
+    last = _ld_re.sub(r"<[^>]+>", "", crumbs[crumbs.rfind("</a>") + 4:]).lstrip(" /›").strip()
+    items.append((html.unescape(last), C["domeniu"] + "/" + path))
+    return ld_tag({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": i, "name": n, "item": u} for i, (n, u) in enumerate(items, 1)]})
+
+def site_ld(business):
+    business = {"@id": C["domeniu"] + "/#firma", "url": C["domeniu"] + "/", **business}
+    return ld_tag({"@context": "https://schema.org", "@graph": [business, {
+        "@type": "WebSite", "@id": C["domeniu"] + "/#site", "url": C["domeniu"] + "/",
+        "name": C["nume"], "inLanguage": "ro", "publisher": {"@id": C["domeniu"] + "/#firma"}}]})
+
 def page(title, desc, path, body):
     canon = C["domeniu"] + "/" + ("" if path == "index.html" else path)
     canon_tag = f'<link rel="canonical" href="{canon}">\n' if C["domeniu"] else ""
+    canon_tag += site_ld({"@type": "HomeAndConstructionBusiness", "name": C["nume"],
+                          "description": "Mobilă la comandă în Timișoara și în toată România", "telephone": C["tel_link"],
+                          "areaServed": [{"@type": "City", "name": "Timișoara"}, {"@type": "Country", "name": "România"}]}) if path == "index.html" else breadcrumb_ld(path, body)
     return f'''<!doctype html>
 <html lang="ro">
 <head>
@@ -354,7 +381,7 @@ def index():
   <div class="hx-bg" aria-hidden="true"><img src="lucrari/alba-1.jpg" alt="" width="1600" height="1200" fetchpriority="high"></div>
   <div class="wrap hx-in">
     <span class="eyebrow pill pill-glass">Fabricăm și montăm · Timișoara, Arad, Oradea, Alba, Hunedoara</span>
-    <h1>Mobilă la comandă, <em>făcută pe centimetru</em> pentru casa ta</h1>
+    <h1>Mobilă la comandă în <em>Timișoara</em>, făcută pe centimetru pentru casa ta</h1>
     <p class="lead">Facem {kw("bucatarii-la-comanda","bucătării")}, {kw("dressinguri-la-comanda","dressinguri")}, {kw("dormitoare-la-comanda","dormitoare")}, {kw("living-la-comanda","mobilă de living")}, {kw("mobila-baie-la-comanda","mobilă de baie")} și {kw("mobila-birou-la-comanda","mobilier pentru firme")}, din {kw("pal-melaminat","PAL melaminat")}, {kw("mdf-vopsit","MDF vopsit")} sau {kw("lemn-masiv","lemn masiv")}. Lucrăm în {orase} și oriunde în țară.</p>
     <div class="cta-row">{call_btn()}<a class="btn ghost ghost-light" href="#oferta">Cere ofertă gratuită</a></div>
     <p class="hx-cap">{icon("image", 16, "#F3B46B")} Bucătărie realizată și montată de echipa noastră</p>
@@ -410,8 +437,8 @@ def index():
   <a class="phone-big" href="tel:{C["tel_link"]}">{C["tel_afisat"]}</a>
 </div></section>
 '''
-    return page(f"Mobilă la comandă în toată România: bucătării, dressinguri | {C['nume']}",
-                "Mobilă la comandă: bucătării, dressinguri, dormitoare, living, baie și birouri. Măsurători gratuite, proiect 3D, transport și montaj incluse, în toată România.",
+    return page(f"Mobilă la comandă în Timișoara: bucătării, dressinguri | {C['nume']}",
+                "Mobilă la comandă în Timișoara: bucătării, dressinguri, dormitoare, living, baie și birouri. Măsurători gratuite, proiect 3D, transport și montaj incluse. Lucrăm și în restul României.",
                 "index.html", body)
 
 def galerie_prod(p):
