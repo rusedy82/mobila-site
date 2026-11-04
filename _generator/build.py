@@ -15,7 +15,7 @@ C = {
     "tel_afisat": "0759 324 006",
     "tel_link": "+40759324006",
     "whatsapp": "40759324006",               # numărul care primește cererile din formular
-    "domeniu": "",                           # gol până avem domeniul: fără canonical și sitemap
+    "domeniu": "https://mobilacomandatimisoara.ro",   # gol = fără canonical și sitemap
 }
 
 def icon(name, size=26, color="currentColor"):
