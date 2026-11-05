@@ -240,12 +240,9 @@ def prod_cards():
 
 PROIECTE = [
     dict(titlu="Bucătărie albă cu lemn închis", sub="Fețe albe fără mânere, corpuri sus și placare în decor de lemn, iluminare LED",
-         poze=[("alba-1", "Bucătărie liniară: fețe albe fără mânere, corpuri suspendate și placare în decor de lemn închis, bandă LED sub corpuri, coloană pentru cuptor și cuptor cu microunde încorporabile", 1600, 1200)]),
-    dict(titlu="Bucătărie bej cu raft deschis", sub="Corpuri până la cornișă, raft deschis și sertare mari",
-         poze=[("bucatarie-1", "Corpuri suspendate și raft deschis pentru căni și farfurii", 4080, 3072),
-               ("bucatarie-2", "Corpuri suspendate pe toată lungimea peretelui, până la cornișă", 4080, 3072),
-               ("bucatarie-3", "Corpuri jos cu sertare mari și picioare reglabile", 4080, 3072),
-               ("bucatarie-4", "Coloană cu nișă pentru cuptorul cu microunde și dulap înalt", 2467, 3935)]),
+         poze=[("alba-2", "Bucătărie liniară: corpuri jos albe fără mânere, blat, placare și corpuri suspendate în decor de lemn închis, cu bandă LED", 1400, 1200),
+               ("alba-3", "Coloană pentru cuptor și cuptor cu microunde încorporabile, lângă sertare mari", 1240, 930),
+               ("alba-1", "Iluminare LED sub corpurile suspendate și hotă încastrată", 1600, 1200)]),
 ]
 def galerie():
     out = ""
@@ -257,7 +254,7 @@ def galerie():
                       f'<img src="lucrari/{f}-mic.jpg" srcset="lucrari/{f}-mic.jpg 720w, lucrari/{f}.jpg 1600w" '
                       f'sizes="(min-width:900px) 60vw, 100vw" alt="{pr["titlu"]}: {alt[0].lower() + alt[1:]}" loading="lazy" width="{w}" height="{h}">'
                       f'<span class="ph-cap">{alt}</span></a>')
-        one = " one" if len(pr["poze"]) == 1 else ""
+        one = {1: " one", 3: " trei"}.get(len(pr["poze"]), "")
         out += f'''<div class="project">
   <div class="project-head"><h3>{pr["titlu"]}</h3><p>{pr["sub"]}</p></div>
   <div class="photos{one}">{tiles}</div>
