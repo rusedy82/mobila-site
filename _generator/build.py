@@ -239,22 +239,33 @@ def prod_cards():
   <div class="pbody"><h3>{kw(p["slug"], p["titlu"])}</h3><p>{kwtxt(CARD_TXT[p["slug"]])}</p><a class="more" href="{p["slug"]}.html">Detalii {icon("arrow", 20)}</a></div></div>''' for p in PRODUSE)
 
 PROIECTE = [
-    dict(titlu="Bucătărie albă cu lemn închis", sub="Fețe albe fără mânere, corpuri sus și placare în decor de lemn, iluminare LED",
-         poze=[("alba-2", "Bucătărie liniară: corpuri jos albe fără mânere, blat, placare și corpuri suspendate în decor de lemn închis, cu bandă LED", 1400, 1200),
-               ("alba-3", "Coloană pentru cuptor și cuptor cu microunde încorporabile, lângă sertare mari", 1240, 930),
-               ("alba-1", "Iluminare LED sub corpurile suspendate și hotă încastrată", 1600, 1200)]),
+    dict(titlu="Bucătării la comandă", sub="Bucătării pe colț și liniare, în culori și decoruri diferite",
+         poze=[("alba-2", "Bucătărie albă fără mânere, cu corpuri și placare în decor de lemn închis și bandă LED", 1400, 1200),
+               ("bucatarie-rifluri", "Bucătărie pe colț cu fețe albe riflate sus și blat în decor de lemn", 1200, 1500),
+               ("bucatarie-neagra", "Bucătărie neagră deschisă spre living, cu insulă", 1000, 750)]),
+    dict(titlu="Dormitoare și dulapuri", sub="Dulapuri până la tavan, uși glisante și mobilier pe peretele întreg",
+         poze=[("dormitor-lamele", "Dormitor cu lamele și bandă LED pe perete și tavan, dulap cu uși glisante", 1200, 1270),
+               ("dulap-glisant", "Dulap cu trei uși glisante, pe toată lățimea peretelui", 1536, 1410),
+               ("camera-birou", "Cameră cu dulap, birou sub fereastră și bibliotecă", 1600, 1200)]),
+    dict(titlu="Living și comode TV", sub="Mobilier pe tot peretele, cu nișă pentru televizor și sertare",
+         poze=[("living-negru", "Mobilier negru cu nișă TV albă și sertare", 1600, 1133),
+               ("living-lemn", "Mobilier în decor de lemn deschis, cu nișă TV", 1600, 1130),
+               ("living-lamele", "Mobilier alb cu nișă centrală și lamele decorative", 1600, 1039)]),
+    dict(titlu="Holuri", sub="Dulapuri înalte, cuiere și bănci cu sertare",
+         poze=[("hol-dulap", "Dulapuri de hol până la tavan, cu fețe negre frezate", 830, 1340),
+               ("hol-lamele", "Hol cu oglindă, cuier pe lamele și bancă cu sertare", 1200, 1300)]),
 ]
-def galerie():
+def galerie(proiecte=PROIECTE):
     out = ""
-    for pr in PROIECTE:
+    for pr in proiecte:
         tiles = ""
         for i, (f, alt, w, h) in enumerate(pr["poze"]):
-            cls = "ph ph-big" if i == 0 else ("ph ph-tall" if h > w else "ph")
+            cls = "ph ph-big" if i == 0 else "ph"
             tiles += (f'<a class="{cls}" href="lucrari/{f}.jpg" data-cap="{alt}">'
                       f'<img src="lucrari/{f}-mic.jpg" srcset="lucrari/{f}-mic.jpg 720w, lucrari/{f}.jpg 1600w" '
                       f'sizes="(min-width:900px) 60vw, 100vw" alt="{pr["titlu"]}: {alt[0].lower() + alt[1:]}" loading="lazy" width="{w}" height="{h}">'
                       f'<span class="ph-cap">{alt}</span></a>')
-        one = {1: " one", 3: " trei"}.get(len(pr["poze"]), "")
+        one = {1: " one", 2: " doi", 3: " trei"}.get(len(pr["poze"]), "")
         out += f'''<div class="project">
   <div class="project-head"><h3>{pr["titlu"]}</h3><p>{pr["sub"]}</p></div>
   <div class="photos{one}">{tiles}</div>
@@ -442,7 +453,7 @@ def galerie_prod(p):
     if p["art"] != "bucatarii": return ""
     return f'''<section class="band"><div class="wrap">
   <div class="head"><span class="eyebrow pill pill-dark">Lucrări</span><h2>Bucătării făcute de noi</h2><p>Apasă pe o poză ca să o vezi mare.</p></div>
-  {galerie()}
+  {galerie(PROIECTE[:1])}
   <div class="cta-row"><a class="btn" href="index.html#oferta">Vreau și eu o bucătărie</a></div>
 </div></section>'''
 

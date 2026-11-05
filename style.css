@@ -394,6 +394,8 @@ section{padding:64px 0}
 .photos.one .ph-big{grid-column:1;grid-row:auto;aspect-ratio:16/9}
 .photos.one .ph-big img{object-position:center 45%}
 @media(min-width:900px){.photos.trei{grid-template-columns:2fr 1fr}.photos.trei .ph-big{aspect-ratio:7/6}.photos.trei .ph:not(.ph-big){aspect-ratio:auto;min-height:0}.photos.trei .ph img{position:absolute;inset:0}}
+.photos.doi{grid-template-columns:1fr 1fr;grid-template-rows:none}
+.photos.doi .ph,.photos.doi .ph-big{grid-column:auto;grid-row:auto;aspect-ratio:4/3}
 .hero-photo{width:100%;max-width:520px;height:auto;border-radius:18px;box-shadow:0 30px 60px -30px rgba(43,36,31,.55);border:6px solid #fff}
 
 /* materiale */
